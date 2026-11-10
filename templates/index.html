@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Presence — smart classroom attendance</title>
+  <link rel="stylesheet" href="/static/style.css"><script src="/static/app.js" defer></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="#"><span class="brand-mark">P</span><span>presence<span class="accent">.</span></span></a>
+    <nav>
+      <button class="nav active" data-view="monitor"><span>◉</span> Live classroom</button>
+      <button class="nav" data-view="students"><span>▤</span> Students</button>
+      <button class="nav" data-view="attendance"><span>✓</span> Attendance</button>
+    </nav>
+    <div class="sidebar-footer"><span class="status-dot"></span> Local processing</div>
+  </aside>
+
+  <main>
+    <header class="topbar"><div><h1 id="page-title">Live classroom</h1></div><div class="model-badge" id="model-status"><span class="status-dot"></span> Model not loaded</div></header>
+    <div id="notice" class="notice" role="status" aria-live="polite">Checking the local recognition engine…</div>
+
+    <section id="view-monitor" class="view">
+      <div class="stats"><article><span>Enrolled students</span><strong id="stat-students">0</strong><small>Available in the gallery</small></article><article><span>Session attendance</span><strong id="stat-present">0</strong><small id="stat-session">No active session</small></article><article><span>Faces in frame</span><strong id="stat-faces">0</strong><small>Known and unknown detections</small></article></div>
+      <div class="monitor-grid">
+        <article class="panel camera-panel"><div class="panel-head"><div><p class="section-kicker">LIVE MONITOR</p><h2>Camera workspace</h2><p>Recognize faces and keep one record per student.</p></div><span class="pill" id="camera-status">Camera off</span></div>
+          <div class="stage"><video id="video" autoplay muted playsinline></video><img id="still" alt="Recognition preview" hidden><canvas id="overlay"></canvas><div id="camera-placeholder"><div class="camera-icon">◎</div><h3>Camera is off</h3><p>Start the camera to begin.</p></div></div>
+          <div class="toolbar"><select id="camera-select" aria-label="Select camera"><option value="">Default device camera</option></select><button id="camera-start" class="primary">Start camera</button><button id="camera-stop">Stop</button><label class="button">Analyze photo<input id="analyze-photo" type="file" accept="image/jpeg,image/png" hidden></label></div>
+        </article>
+        <article class="panel feed-panel"><div class="panel-head"><div><p class="section-kicker">RECOGNITION FEED</p><h2>Who's here?</h2></div></div><div id="detections" class="feed"><p class="empty">Detections will appear here.</p></div>
+          <div class="session-box"><div><p class="section-kicker">CLASS SESSION</p><h3>Start taking attendance</h3></div><label>Session name<input id="session-name" placeholder="e.g. Computer Vision · Tuesday"></label><div class="session-actions"><button id="session-start" class="primary">Start session</button><button id="session-end">End session</button></div><p id="active-session">No active session.</p></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="view-students" class="view" hidden><div class="two-col"><article class="panel"><div class="panel-head"><div><p class="section-kicker">NEW STUDENT</p><h2>Add a student</h2></div></div><form id="enroll-form"><label>Student ID<input id="student-id" required maxlength="50" pattern="[A-Za-z0-9_-]+" placeholder="student5"></label><label>Display name<input id="student-name" required maxlength="100" placeholder="Student name"></label><label>Enrollment photos<input id="enroll-files" type="file" accept="image/jpeg,image/png" multiple></label><button type="button" id="capture-photo">Capture camera frame</button><p id="capture-count" class="helper">0 camera photos captured</p><button class="primary full" type="submit">Save student</button></form></article><article class="panel"><div class="panel-head"><div><p class="section-kicker">STUDENTS</p><h2>Enrolled students</h2></div><span class="count-badge" id="student-count">0</span></div><div id="student-list"></div></article></div></section>
+
+    <section id="view-attendance" class="view" hidden><article class="panel"><div class="panel-head"><div><p class="section-kicker">ATTENDANCE</p><h2>Session records</h2></div><a id="download-csv" class="button disabled" href="#">Download CSV</a></div><label>Session<select id="session-select"><option value="">No sessions yet</option></select></label><div class="table-scroll"><table><thead><tr><th>Student ID</th><th>Name</th><th>Status</th><th>First seen</th></tr></thead><tbody id="attendance-rows"></tbody></table></div></article></section>
+  </main>
+</body>
+</html>

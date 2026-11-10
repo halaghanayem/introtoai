@@ -1,0 +1,13 @@
+{
+  "host": "127.0.0.1",
+  "port": 8000,
+  "device": "cpu",
+  "cpu_threads": 2,
+  "checkpoint": "vendor/mobile_weights/model_mobilefacenet.pth",
+  "confirmations": 3,
+  "confirmation_gap_seconds": 5,
+  "threshold_status": "0.50 cosine similarity cutoff for live recognition; unknown-person performance not established",
+  "team_source": "vendor",
+  "cosine_similarity_threshold": 0.5,
+  "dataset_folder": "data/face_splits/train"
+}

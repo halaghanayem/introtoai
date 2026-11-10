@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+.codex/
+.pytest_cache/
+.mypy_cache/
+
+# Local/private runtime data (face images, embeddings, attendance records)
+data/
+*.sqlite3
+*.db
+*.npz
+
+# Local model artifacts generated during experiments
+models/*.pth
+vendor/mobilefacenet_arcface/*.pth

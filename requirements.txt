@@ -1,0 +1,11 @@
+# Python 3.11 baseline; also inspect the original FaceNet project's requirements.
+numpy==1.26.4
+Pillow==10.2.0
+torch==2.2.2
+torchvision==0.17.2
+opencv-python-headless==4.10.0.84
+pandas==2.2.3
+scikit-learn==1.5.2
+tqdm==4.67.1
+matplotlib==3.8.4
+natsort==8.4.0
