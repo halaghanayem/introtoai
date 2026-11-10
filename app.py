@@ -44,7 +44,9 @@ class Application:
         self.root = Path(root)
         self.config = json.loads((self.root / 'config.json').read_text())
         self.validate_config()
-        self.store = Store(self.root / 'data' / 'attendance.sqlite3')
+        self.data_dir = Path(os.environ.get('PRESENCE_DATA_DIR', str(self.root / 'data')))
+        self.data_dir.mkdir(parents=True, exist_ok=True)
+        self.store = Store(self.data_dir / 'attendance.sqlite3')
         self.engine = engine or FaceEngine(self.config, self.root)
         self.token = secrets.token_urlsafe(32)
         self.lock = threading.RLock()
@@ -88,7 +90,7 @@ class Application:
         # Keep an auditable copy of accepted source images as part of the local
         # enrollment dataset. Recognition still uses the stored embeddings, so
         # adding a student never requires retraining the MobileFaceNet model.
-        dataset_dir = self.root / 'data' / 'enrolled' / sid
+        dataset_dir = self.data_dir / 'enrolled' / sid
         dataset_dir.mkdir(parents=True, exist_ok=True)
         stamp = int(time.time() * 1000)
         for index, image in enumerate(enrollment_images, 1):
@@ -150,7 +152,7 @@ class Application:
             vectors.append(faces[0]['embedding'])
             enrollment_images.append(image)
         self.store.replace_templates(sid, vectors, self.engine.fingerprint)
-        dataset_dir = self.root / 'data' / 'enrolled' / sid
+        dataset_dir = self.data_dir / 'enrolled' / sid
         dataset_dir.mkdir(parents=True, exist_ok=True)
         for path in dataset_dir.iterdir():
             if path.is_file() and path.suffix.lower() in {'.jpg', '.jpeg', '.png'}:
@@ -240,7 +242,7 @@ def handler_for(application):
                 if parsed.path == '/api/state':
                     self.reply(200, application.state())
                 elif parsed.path == '/api/evaluation':
-                    path = application.root / 'data/evaluation/latest.json'
+                    path = application.data_dir / 'evaluation/latest.json'
                     self.reply(200, json.loads(path.read_text()) if path.exists() else {'message': 'No evaluation run yet. See README.'})
                 elif parsed.path == '/api/report':
                     sid = parse_qs(parsed.query).get('session_id', [''])[0]
