@@ -4,6 +4,7 @@ import base64
 import csv
 import io
 import json
+import os
 import re
 import secrets
 import threading
@@ -224,7 +225,11 @@ def handler_for(application):
 
         def valid_host(self):
             hostname = self.headers.get('Host', '').split(':')[0]
-            return hostname in ('localhost', '127.0.0.1')
+            allowed = {'localhost', '127.0.0.1'}
+            render_host = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+            if render_host:
+                allowed.add(render_host.split(':')[0])
+            return hostname in allowed
 
         def do_GET(self):
             if not self.valid_host():
@@ -263,7 +268,9 @@ def handler_for(application):
                 self.reply(403, {'error': 'Refresh this page before continuing.'})
                 return
             origin = self.headers.get('Origin')
-            if origin and origin != 'http://' + self.headers.get('Host', ''):
+            forwarded_proto = self.headers.get('X-Forwarded-Proto', 'http').split(',')[0].strip()
+            expected_origin = forwarded_proto + '://' + self.headers.get('Host', '')
+            if origin and origin != expected_origin:
                 self.reply(403, {'error': 'Cross-origin requests are not allowed.'})
                 return
             try:
@@ -287,9 +294,10 @@ def main():
     parser.add_argument('--port', type=int)
     args = parser.parse_args()
     application = Application()
-    port = args.port or application.config['port']
-    server = ThreadingHTTPServer(('127.0.0.1', port), handler_for(application))
-    print(f'Open http://localhost:{port} — press Ctrl+C to stop.', flush=True)
+    port = args.port or int(os.environ.get('PORT', application.config['port']))
+    host = os.environ.get('HOST', '0.0.0.0')
+    server = ThreadingHTTPServer((host, port), handler_for(application))
+    print(f'Listening on {host}:{port} — press Ctrl+C to stop.', flush=True)
     print('Camera images are processed locally. Team MobileFaceNet loads when requested.', flush=True)
     try:
         server.serve_forever()
